@@ -1,5 +1,5 @@
 before_script:
-  - git remote set-url origin http://localhost:8080/root/flask-example-devops.git
+  - git remote set-url origin http://localhost:8080/root/flask-example-devops
 
 stages:
   - test
@@ -16,6 +16,9 @@ test:
   script:
     - pip install -r requirements.txt
     - pip install pytest coverage
+    - echo "Installed dependencies"
+    - pip freeze
+    - echo "Running tests"
     - coverage run -m pytest
     - coverage report
     - echo "The CI runner is working!"
