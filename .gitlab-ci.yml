@@ -1,5 +1,4 @@
 before_script:
-  - git config --global url."http://host.docker.internal:8080/".insteadOf "http://gitlab.local/"
   - git remote set-url origin http://localhost:8080/root/flask-example-devops.git
 
 stages:
@@ -32,8 +31,7 @@ build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
-    - docker build -t $IMAGE_TAG .docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
-
+    - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
 
 deploy_staging:
