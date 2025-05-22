@@ -2,6 +2,7 @@ before_script:
   - git config --global http.sslVerify false
   - git config --global url."http://host.docker.internal:8080/".insteadOf "http://gitlab.local/"
   - git config --global url."http://host.docker.internal/".insteadOf "http://gitlab.local/"
+  - git remote set-url origin http://host.docker.internal/root/flask-example-devops.git
 
 stages:
   - test
