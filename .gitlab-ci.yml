@@ -1,0 +1,52 @@
+stages:
+  - test
+  - build
+  - deploy_staging
+  - deploy_production
+
+variables:
+  IMAGE_TAG: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+test:
+  stage: test
+  image: python:3.12
+  script:
+    - pip install -r requirements.txt
+    - pip install pytest coverage
+    - coverage run -m pytest
+    - coverage report
+    - echo "The CI runner is working!"
+  artifacts:
+    reports:
+      junit: report.xml
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -t $IMAGE_TAG .docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
+
+    - docker push $IMAGE_TAG
+
+deploy_staging:
+  stage: deploy_staging
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config use-context my-k8s-context
+    - kubectl set image deployment/flask-app flask-container=$IMAGE_TAG -n staging
+  environment:
+    name: staging
+
+deploy_production:
+  stage: deploy_production
+  image: bitnami/kubectl:latest
+  when: manual
+  script:
+    - kubectl config use-context my-k8s-context
+    - kubectl set image deployment/flask-app flask-container=$IMAGE_TAG -n production
+  environment:
+    name: production
