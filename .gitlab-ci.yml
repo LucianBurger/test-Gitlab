@@ -1,3 +1,7 @@
+before_script:
+  - git config --global http.sslVerify false
+  - git config --global url."http://host.docker.internal:8080/".insteadOf "http://gitlab.local/"
+
 stages:
   - test
   - build
